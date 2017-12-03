@@ -1,0 +1,29 @@
+{
+  "name": "screenhopper",
+  "version": "0.1.0",
+  "main": "index.js",
+  "author": "Enrico Sacchetti <enrico@theetrain.ca>",
+  "license": "ISC",
+  "scripts": {
+    "start:backend": "node backend/index.js",
+    "start:frontend":
+      "browser-sync start --https -s -f ./frontend/** --port 3001 --startPath ./frontend/"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "browser-sync": "^2.18.13",
+    "eslint": "^4.10.0",
+    "eslint-config-prettier": "^2.7.0",
+    "eslint-config-standard": "^10.2.1",
+    "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-node": "^5.2.1",
+    "eslint-plugin-prettier": "^2.3.1",
+    "eslint-plugin-promise": "^3.6.0",
+    "eslint-plugin-standard": "^3.0.1",
+    "prettier": "^1.8.1"
+  },
+  "dependencies": {
+    "express": "^4.16.2",
+    "socket.io": "^2.0.4"
+  }
+}

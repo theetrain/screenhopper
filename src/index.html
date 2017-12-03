@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>WebSockets Demo</title>
+
+  <style>
+    body,
+    html {
+      margin: 0;
+      padding: 0;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    div {
+      box-sizing: border-box;
+    }
+
+    .wrapper {
+      padding: 1rem;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .page {
+      width: calc(100% - 2rem);
+      height: calc(100% - 2rem);
+    }
+
+    .canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      min-width: 100vw;
+      min-height: 100vh;
+    }
+
+    .character {
+      width: 100px;
+      height: 100px;
+      background-color: #000;
+      position: absolute;
+      top: 0;
+      left: 0;
+      transform: translate(calc(50vw - 50px), calc(50vh - 50px));
+    }
+
+    .inactive {
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="page-wrapper" class="wrapper">
+    <div id="page-connect" class="page">
+      <h1>WebSockets Demo</h1>
+
+      <div id="status">Connecting...</div>
+
+      <button id="start-host">Host</button>
+      <br>
+
+      <input id="client-id" />
+      <button id="start-client">Join</button>
+    </div>
+
+    <div id="page-play" class="page inactive">
+      <h1>Welcome to Screen Hopper</h1>
+      <div>This is screen #
+        <span id="play-screen-number">0</span>
+      </div>
+
+      <div id="canvas" class="canvas">
+        <div id="character" class="character"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
+  <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+  <script>
+    $(document).ready(function () {
+      var socket = io()
+      var $connectStatus = $('#status')
+      var $screenStatus = $('#play-screen-number')
+      var $canvas = $('#canvas')
+      var $page = {
+        connect: $('#page-connect'),
+        play: $('#page-play')
+      }
+      var $button = {
+        host: $('#start-host'),
+        client: $('#start-client')
+      }
+
+      $button.host.on('click', function () {
+        console.log('Hosting session')
+        socket.emit('host', {
+          width: $(window).width(),
+          height: $(window).height()
+        })
+      })
+
+      $button.client.on('click', function () {
+        console.log('Joining session')
+        socket.emit('client', {
+          width: $(window).width(),
+          height: $(window).height()
+        })
+      })
+
+      socket.on('host', function (response) {
+        $page.connect.addClass('inactive')
+        $page.play.removeClass('inactive')
+        $screenStatus.html(response.screen)
+      })
+
+      socket.on('client', function (response) {
+        $page.connect.addClass('inactive')
+        $page.play.removeClass('inactive')
+        $screenStatus.html(response.screen)
+      })
+    })
+  </script>
+</body>
+
+</html>
