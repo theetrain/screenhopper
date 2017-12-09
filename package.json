@@ -5,11 +5,13 @@
   "author": "Enrico Sacchetti <enrico@theetrain.ca>",
   "license": "ISC",
   "scripts": {
-    "dev": "node src/index.js"
+    "dev": "node src/index.js",
+    "test": "echint ./src && eslint ./src/**/*.js"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "browser-sync": "^2.18.13",
+    "echint": "^4.0.1",
     "eslint": "^4.10.0",
     "eslint-config-prettier": "^2.7.0",
     "eslint-config-standard": "^10.2.1",
