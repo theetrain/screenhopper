@@ -5,9 +5,7 @@
   "author": "Enrico Sacchetti <enrico@theetrain.ca>",
   "license": "ISC",
   "scripts": {
-    "start:backend": "node backend/index.js",
-    "start:frontend":
-      "browser-sync start --https -s -f ./frontend/** --port 3001 --startPath ./frontend/"
+    "dev": "node src/index.js"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
