@@ -7,6 +7,7 @@ $(document).ready(function () {
   // Session
   var sessionId = ''
   var screenNum = 0
+  var screens = []
 
   // Page elements
   var $screenStatus = $('#play-screen-number')
@@ -62,49 +63,57 @@ $(document).ready(function () {
     if (!sessionId) {
       return
     }
-    $page.connect.addClass('inactive')
-    $page.play.removeClass('inactive')
 
-    setScreenNum(response.screenNum)
+    setSession(response)
   })
 
   socket.on('client', function (response) {
-    $page.connect.addClass('inactive')
-    $page.play.removeClass('inactive')
-
-    setScreenNum(response.screenNum)
+    setSession(response)
   })
 
   socket.on('update', function (response) {
-    updateCharacter(response.x, response.y)
+    animateCharacter(response.x, response.y)
   })
 
   // ###
   // Helpers
   var startAnimation = function () {
-    var step = function () {
-      updateCharacter(
-        $canvas.character.offset().left + 1,
-        $canvas.character.offset().top
-      )
-      window.requestAnimationFrame(step)
-    }
-
-    window.requestAnimationFrame(step)
+    updateCharacter(
+      $canvas.character.offset().left,
+      $canvas.character.offset().top
+    )
   }
+
+  var moveRight = function () {}
 
   var updateCharacter = function (x, y) {
-    $canvas.character.css('transform', 'translate(' + x + 'px, ' + y + 'px')
+    socket.emit('update', {
+      x: x + 1,
+      y: y
+    })
   }
 
-  var setScreenNum = function (screenNumToAssign) {
-    // Don't set screen number if already set
+  var animateCharacter = function (x, y) {
+    window.requestAnimationFrame(function () {
+      $canvas.character.css('transform', 'translate(' + x + 'px, ' + y + 'px')
+    })
 
+    updateCharacter(x + 1, y)
+  }
+
+  var setSession = function (response) {
+    // Don't set screen number if already set
     if (screenNum) {
       return
     }
 
-    screenNum = screenNumToAssign
-    $screenStatus.html(screenNumToAssign)
+    $page.connect.addClass('inactive')
+    $page.play.removeClass('inactive')
+
+    screens = response.screens
+    console.log('Screens are', screens)
+
+    screenNum = response.screenNum
+    $screenStatus.html(screenNum)
   }
 })

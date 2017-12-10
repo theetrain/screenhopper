@@ -30,7 +30,8 @@ io.on('connection', socket => {
     logInfo('Host')
 
     io.emit('host', {
-      screenNum: 1
+      screenNum: 1,
+      screens
     }) // generate session code
   })
 
@@ -45,11 +46,14 @@ io.on('connection', socket => {
     logInfo('Client')
 
     io.emit('client', {
-      screenNum: 2
+      screenNum: 2,
+      screens
     })
   })
 
-  socket.on('update', () => {})
+  socket.on('update', position => {
+    io.emit('update', position)
+  })
 
   socket.on('disconnect', () => {
     console.log('user disconnected')
