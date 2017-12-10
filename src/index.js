@@ -14,37 +14,57 @@ var screens = [
   }
 ]
 
+var sessionId = ''
+
 app.use('/', express.static(`${__dirname}/public`))
 
-io.on('connection', function (socket) {
+io.on('connection', socket => {
   console.log('user connected')
 
   // Users that are hosting screen hopper sessions
-  socket.on('host', function (dimensions) {
-    Object.assign(screens[0], dimensions)
+  socket.on('host', data => {
+    Object.assign(screens[0], data.screen)
 
-    console.log('Screens are', screens)
+    sessionId = data.sessionId
+
+    logInfo('Host')
 
     io.emit('host', {
-      screen: 1
+      screenNum: 1
     }) // generate session code
   })
 
-  socket.on('client', function (dimensions) {
-    Object.assign(screens[1], dimensions)
+  socket.on('client', data => {
+    if (data.sessionId !== sessionId) {
+      console.warn('Client session ID does not match')
+      return
+    }
 
-    console.log('Screens are', screens)
+    Object.assign(screens[1], data.screen)
+
+    logInfo('Client')
 
     io.emit('client', {
-      screen: 2
+      screenNum: 2
     })
   })
 
-  socket.on('disconnect', function () {
+  socket.on('update', () => {})
+
+  socket.on('disconnect', () => {
     console.log('user disconnected')
   })
 })
 
-http.listen(3000, function () {
+http.listen(3000, () => {
   console.log('listening on *:3000')
 })
+
+// ###
+// Helpers
+
+var logInfo = who => {
+  console.log(`${who} connected`)
+  console.log('Screens are', screens)
+  console.log('Session ID is', sessionId)
+}
