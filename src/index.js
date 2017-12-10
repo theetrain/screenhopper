@@ -51,8 +51,8 @@ io.on('connection', socket => {
     })
   })
 
-  socket.on('update', position => {
-    io.emit('update', position)
+  socket.on('update', data => {
+    io.emit('update', data)
   })
 
   socket.on('disconnect', () => {

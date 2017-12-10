@@ -7,7 +7,7 @@ $(document).ready(function () {
   // Session
   var sessionId = ''
   var screenNum = 0
-  var screens = []
+  var screens
 
   // Page elements
   var $screenStatus = $('#play-screen-number')
@@ -72,33 +72,45 @@ $(document).ready(function () {
   })
 
   socket.on('update', function (response) {
-    animateCharacter(response.x, response.y)
+    animateCharacter(
+      response.startScreen,
+      response.endScreen,
+      response.endPoint
+    )
   })
 
   // ###
   // Helpers
   var startAnimation = function () {
-    updateCharacter(
-      $canvas.character.offset().left,
-      $canvas.character.offset().top
-    )
+    moveRight()
   }
 
-  var moveRight = function () {}
+  var moveRight = function () {
+    var startScreen = screenNum
+    var endScreen = screenNum + 1
 
-  var updateCharacter = function (x, y) {
+    var endPoint = {
+      x: screens[endScreen].x / 2,
+      y: screens[endScreen].y / 2
+    }
+
     socket.emit('update', {
-      x: x + 1,
-      y: y
+      startScreen: startScreen,
+      endScreen: endScreen,
+      endPoint: endPoint
     })
   }
 
-  var animateCharacter = function (x, y) {
-    window.requestAnimationFrame(function () {
-      $canvas.character.css('transform', 'translate(' + x + 'px, ' + y + 'px')
-    })
-
-    updateCharacter(x + 1, y)
+  var animateCharacter = function (startScreen, endScreen, endPoint) {
+    if (screenNum === startScreen) {
+      // Animate away from here
+      $canvas.character.animate()
+    } else if (screenNum === endScreen) {
+      // Animate into here
+    }
+    // window.requestAnimationFrame(function () {
+    //   $canvas.character.css('transform', 'translate(' + x + 'px, ' + y + 'px')
+    // })
   }
 
   var setSession = function (response) {
