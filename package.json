@@ -10,17 +10,17 @@
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
-    "browser-sync": "^2.18.13",
+    "browser-sync": "^2.23.5",
     "echint": "^4.0.1",
-    "eslint": "^4.10.0",
+    "eslint": "^4.16.0",
     "eslint-config-prettier": "^2.7.0",
-    "eslint-config-standard": "^10.2.1",
+    "eslint-config-standard": "^11.0.0-beta.0",
     "eslint-plugin-import": "^2.8.0",
     "eslint-plugin-node": "^5.2.1",
-    "eslint-plugin-prettier": "^2.3.1",
+    "eslint-plugin-prettier": "^2.5.0",
     "eslint-plugin-promise": "^3.6.0",
     "eslint-plugin-standard": "^3.0.1",
-    "prettier": "^1.8.1"
+    "prettier": "^1.10.2"
   },
   "dependencies": {
     "express": "^4.16.2",

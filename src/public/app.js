@@ -1,5 +1,14 @@
 /* globals $, io */
 
+/*
+* Overall flow
+* 1. Host creates session ID, their device is stored in an array
+* 2. Client connects to host's session ID, their device is stored in an array
+* 3. Object animates from a 'sender' screen to a 'receiver' screen. On both screens
+*    the animation is static. No object data such as screen position is stored
+*    on the session, nor is it shared.
+*/
+
 $(document).ready(function () {
   // Vendors
   var socket = io()
