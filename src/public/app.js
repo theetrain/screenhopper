@@ -52,18 +52,15 @@ $(document).ready(function () {
 
   $button.client.on('click', function () {
     console.log('Joining session')
-    socket.emit('client', {
-      screen: {
-        width: $(window).width(),
-        height: $(window).height()
-      },
-      sessionId: $('#client-id').val()
-    })
+    socket.emit('client', getSession())
   })
 
   $button.play.on('click', function () {
     console.log('Start animation')
-    startAnimation()
+    moveRightOut().then(function () {
+      console.log('Animation over')
+      socket.emit('pushRight', getSession())
+    })
   })
 
   // ###
@@ -90,30 +87,30 @@ $(document).ready(function () {
 
   // ###
   // Helpers
-  var startAnimation = function () {
-    moveRight()
+  var moveRightOut = function () {
+    return new Promise(function (resolve, reject) {
+      $canvas.character
+        .css({
+          transform: 'translate(100vw, calc(50vh - 50px))'
+        })
+        .one('transitionend', function () {
+          resolve()
+        })
+    })
   }
 
-  var moveRight = function () {
-    var startScreen = screenNum
-    var endScreen = screenNum + 1
-
-    var endPoint = {
-      x: screens[endScreen].x / 2,
-      y: screens[endScreen].y / 2
-    }
-
-    socket.emit('update', {
-      startScreen: startScreen,
-      endScreen: endScreen,
-      endPoint: endPoint
+  var moveRightIn = function () {
+    $canvas.character.css({
+      transform: 'translate()'
     })
   }
 
   var animateCharacter = function (startScreen, endScreen, endPoint) {
     if (screenNum === startScreen) {
       // Animate away from here
-      $canvas.character.animate()
+      $canvas.character.animate({
+        transform: 'translate(100vw, calc(50vh - 50px))'
+      })
     } else if (screenNum === endScreen) {
       // Animate into here
     }
@@ -136,5 +133,15 @@ $(document).ready(function () {
 
     screenNum = response.screenNum
     $screenStatus.html(screenNum)
+  }
+
+  var getSession = function () {
+    return {
+      screen: {
+        width: $(window).width(),
+        height: $(window).height()
+      },
+      sessionId: $('#client-id').val()
+    }
   }
 })

@@ -1,51 +1,53 @@
 body,
 html {
-    margin: 0;
-    padding: 0;
-    width: 100vw;
-    height: 100vh;
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
 }
 
 div {
-    box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 .wrapper {
-    padding: 1rem;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
+  padding: 1rem;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
 }
 
 .page {
-    width: calc(100% - 2rem);
-    height: calc(100% - 2rem);
+  width: calc(100% - 2rem);
+  height: calc(100% - 2rem);
 }
 
 .controls {
-    position: relative;
-    z-index: 10;
+  position: relative;
+  z-index: 10;
 }
 
 .canvas {
-    position: absolute;
-    top: 0;
-    left: 0;
-    min-width: 100vw;
-    min-height: 100vh;
-    z-index: 1;
+  position: absolute;
+  top: 0;
+  left: 0;
+  min-width: 100vw;
+  min-height: 100vh;
+  z-index: 1;
+  overflow: hidden;
 }
 
 .character {
-    width: 100px;
-    height: 100px;
-    background-color: #000;
-    position: absolute;
-    top: 0;
-    left: 0;
-    transform: translate(calc(50vw - 50px), calc(50vh - 50px));
+  width: 100px;
+  height: 100px;
+  background-color: #000;
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: translate(calc(50vw - 50px), calc(50vh - 50px));
+  transition: transform linear 1s;
 }
 
 .inactive {
-    display: none;
+  display: none;
 }

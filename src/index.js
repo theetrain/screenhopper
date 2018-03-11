@@ -55,6 +55,11 @@ io.on('connection', socket => {
     io.emit('update', data)
   })
 
+  socket.on('pushRight', data => {
+    console.log(data)
+    // io.emit('')
+  })
+
   socket.on('disconnect', () => {
     console.log('user disconnected')
   })
