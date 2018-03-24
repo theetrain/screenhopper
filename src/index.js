@@ -37,7 +37,7 @@ io.on('connection', socket => {
 
   socket.on('client', data => {
     if (data.sessionId !== sessionId) {
-      console.warn('Client session ID does not match')
+      console.warn('Client session ID does not match', data.sessionId)
       return
     }
 
@@ -57,7 +57,9 @@ io.on('connection', socket => {
 
   socket.on('pushRight', data => {
     console.log(data)
-    // io.emit('')
+    io.emit('pullRight', {
+      screenNum: 2
+    })
   })
 
   socket.on('disconnect', () => {

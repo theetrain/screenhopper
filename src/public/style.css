@@ -48,6 +48,10 @@ div {
   transition: transform linear 1s;
 }
 
+.notransition {
+  transition: none;
+}
+
 .inactive {
   display: none;
 }

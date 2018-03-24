@@ -26,6 +26,7 @@ $(document).ready(function () {
   }
   var $page = {
     connect: $('#page-connect'),
+    idBox: $('#client-id'),
     play: $('#page-play')
   }
   var $button = {
@@ -52,6 +53,7 @@ $(document).ready(function () {
 
   $button.client.on('click', function () {
     console.log('Joining session')
+    sessionId = $page.idBox.val()
     socket.emit('client', getSession())
   })
 
@@ -85,8 +87,15 @@ $(document).ready(function () {
     )
   })
 
+  socket.on('pullRight', function (response) {
+    console.log('ready to pull')
+    if (response.screenNum === screenNum) {
+      moveRightIn()
+    }
+  })
+
   // ###
-  // Helpers
+  // Animaters
   var moveRightOut = function () {
     return new Promise(function (resolve, reject) {
       $canvas.character
@@ -100,8 +109,14 @@ $(document).ready(function () {
   }
 
   var moveRightIn = function () {
-    $canvas.character.css({
-      transform: 'translate()'
+    return new Promise(function (resolve, reject) {
+      $canvas.character
+        .css({
+          transform: 'translate(50vw, calc(50vh - 50px))'
+        })
+        .one('transitionend', function () {
+          resolve()
+        })
     })
   }
 
@@ -125,14 +140,21 @@ $(document).ready(function () {
       return
     }
 
-    $page.connect.addClass('inactive')
-    $page.play.removeClass('inactive')
-
     screens = response.screens
     console.log('Screens are', screens)
 
     screenNum = response.screenNum
     $screenStatus.html(screenNum)
+
+    if (screenNum !== 1) {
+      $canvas.character
+        .addClass('notransition')
+        .css('transform', 'translate(-100px, calc(50vh - 50px))')
+        .removeClass('notransition')
+    }
+
+    $page.connect.addClass('inactive')
+    $page.play.removeClass('inactive')
   }
 
   var getSession = function () {
@@ -141,7 +163,8 @@ $(document).ready(function () {
         width: $(window).width(),
         height: $(window).height()
       },
-      sessionId: $('#client-id').val()
+      sessionId: sessionId,
+      screenNum: screenNum
     }
   }
 })
