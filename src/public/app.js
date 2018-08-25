@@ -16,7 +16,7 @@ $(document).ready(function () {
   // Session
   var session = {
     sessionId: '',
-    screenNum: 0,
+    screenNum: '',
     screens: {}
   }
 
@@ -61,24 +61,21 @@ $(document).ready(function () {
 
   $button.play.on('click', function () {
     console.log('Start animation')
-    move('right')
+    moveOut('right')
   })
 
-  var move = function (dir) {
-    moveDirectionOut(dir).then(function () {
-      console.log('Animation over')
-      socket.emit('pushDirection', Object.assign({}, session, { dir: 'right' }))
-    })
+  var moveOut = function (dir) {
+    socket.emit('pushDirection', Object.assign({}, session, { dir: dir }))
   }
 
   // developer hacks
   $(window).on('keydown', function (e) {
     switch (e.key) {
       case 'ArrowRight':
-        move('right')
+        moveOut('right')
         break
       case 'ArrowLeft':
-        move('left')
+        moveOut('left')
         break
       default:
         break
@@ -99,6 +96,18 @@ $(document).ready(function () {
     setSession(response)
   })
 
+  socket.on('pushDirection', function (response) {
+    console.log('ready to push')
+    if (response.screenNum === session.screenNum) {
+      moveDirectionOut(response.dir).then(function () {
+        socket.emit(
+          'pullDirection',
+          Object.assign({}, session, { dir: response.dir })
+        )
+      })
+    }
+  })
+
   socket.on('pullDirection', function (response) {
     console.log('ready to pull')
     if (response.screenNum === session.screenNum) {
@@ -114,8 +123,9 @@ $(document).ready(function () {
     if (dir === 'right') {
       x = '100vw'
     } else if (dir === 'left') {
-      x = '-100vw'
+      x = '-100px'
     }
+
     return new Promise(function (resolve) {
       $canvas.character
         .css({
@@ -128,8 +138,21 @@ $(document).ready(function () {
   }
 
   var moveDirectionIn = function (dir) {
+    var x = ''
+
+    if (dir === 'right') {
+      x = '-100px'
+    } else if (dir === 'left') {
+      x = '100vw'
+    }
+
     return new Promise(function (resolve) {
       $canvas.character
+        .addClass('notransition')
+        .css({
+          transform: 'translate(' + x + ', calc(50vh - 50px))'
+        })
+        .removeClass('notransition')
         .css({
           transform: 'translate(50vw, calc(50vh - 50px))'
         })
@@ -141,7 +164,7 @@ $(document).ready(function () {
 
   var setSession = function (response) {
     // Don't set screen number if already set
-    if (session.screenNum) {
+    if (session.screenNum !== '') {
       return
     }
 
@@ -151,7 +174,7 @@ $(document).ready(function () {
     session.screenNum = response.screenNum
     $screenStatus.html(session.screenNum)
 
-    if (session.screenNum !== 1) {
+    if (session.screenNum !== 0) {
       $canvas.character
         .addClass('notransition')
         .css('transform', 'translate(-100px, calc(50vh - 50px))')

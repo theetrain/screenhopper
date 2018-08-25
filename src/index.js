@@ -16,6 +16,20 @@ var screens = [
 
 var sessionId = ''
 
+var determineNextScreen = (currentScreen, dir) => {
+  console.log('direction is', dir)
+
+  if (dir === 'right') {
+    return currentScreen + 1
+  }
+
+  if (dir === 'left') {
+    return currentScreen - 1
+  }
+
+  return 1
+}
+
 app.use('/', express.static(`${__dirname}/public`))
 
 io.on('connection', socket => {
@@ -23,14 +37,14 @@ io.on('connection', socket => {
 
   // Users that are hosting screen hopper sessions
   socket.on('host', data => {
-    Object.assign(screens[0], data.screen)
+    Object.assign(screens[0], data.screen, { hasCharacter: true })
 
     sessionId = data.sessionId
 
     logInfo('Host')
 
     io.emit('host', {
-      screenNum: 1,
+      screenNum: 0,
       screens
     }) // generate session code
   })
@@ -41,20 +55,34 @@ io.on('connection', socket => {
       return
     }
 
-    Object.assign(screens[1], data.screen)
+    Object.assign(screens[1], data.screen, { hasCharacter: false })
 
     logInfo('Client')
 
     io.emit('client', {
-      screenNum: 2,
+      screenNum: 1,
       screens
     })
   })
 
   socket.on('pushDirection', data => {
     console.log(data)
+    // screens[data.screenNum].hasCharacter = false
+    io.emit('pushDirection', {
+      screenNum: data.screenNum,
+      dir: data.dir
+    })
+  })
+
+  socket.on('pullDirection', data => {
+    console.log(data)
+    console.log(
+      'pulling to screen #',
+      determineNextScreen(data.screenNum, data.dir)
+    )
+    // screens[data.screenNum].hasCharacter = true
     io.emit('pullDirection', {
-      screenNum: 2,
+      screenNum: determineNextScreen(data.screenNum, data.dir),
       dir: data.dir
     })
   })
