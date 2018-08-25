@@ -51,14 +51,11 @@ io.on('connection', socket => {
     })
   })
 
-  socket.on('update', data => {
-    io.emit('update', data)
-  })
-
-  socket.on('pushRight', data => {
+  socket.on('pushDirection', data => {
     console.log(data)
-    io.emit('pullRight', {
-      screenNum: 2
+    io.emit('pullDirection', {
+      screenNum: 2,
+      dir: data.dir
     })
   })
 

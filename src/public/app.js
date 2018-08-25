@@ -14,9 +14,11 @@ $(document).ready(function () {
   var socket = io()
 
   // Session
-  var sessionId = ''
-  var screenNum = 0
-  var screens
+  var session = {
+    sessionId: '',
+    screenNum: 0,
+    screens: {}
+  }
 
   // Page elements
   var $screenStatus = $('#play-screen-number')
@@ -40,35 +42,53 @@ $(document).ready(function () {
   $button.host.on('click', function () {
     console.log('Hosting session')
 
-    sessionId = 'abc'
+    session.sessionId = 'abc'
 
     socket.emit('host', {
       screen: {
         width: $(window).width(),
         height: $(window).height()
       },
-      sessionId: sessionId
+      sessionId: session.sessionId
     })
   })
 
   $button.client.on('click', function () {
     console.log('Joining session')
-    sessionId = $page.idBox.val()
-    socket.emit('client', getSession())
+    session.sessionId = $page.idBox.val()
+    socket.emit('client', session)
   })
 
   $button.play.on('click', function () {
     console.log('Start animation')
-    moveRightOut().then(function () {
+    move('right')
+  })
+
+  var move = function (dir) {
+    moveDirectionOut(dir).then(function () {
       console.log('Animation over')
-      socket.emit('pushRight', getSession())
+      socket.emit('pushDirection', Object.assign({}, session, { dir: 'right' }))
     })
+  }
+
+  // developer hacks
+  $(window).on('keydown', function (e) {
+    switch (e.key) {
+      case 'ArrowRight':
+        move('right')
+        break
+      case 'ArrowLeft':
+        move('left')
+        break
+      default:
+        break
+    }
   })
 
   // ###
   // Socket events
   socket.on('host', function (response) {
-    if (!sessionId) {
+    if (!session.sessionId) {
       return
     }
 
@@ -79,28 +99,27 @@ $(document).ready(function () {
     setSession(response)
   })
 
-  socket.on('update', function (response) {
-    animateCharacter(
-      response.startScreen,
-      response.endScreen,
-      response.endPoint
-    )
-  })
-
-  socket.on('pullRight', function (response) {
+  socket.on('pullDirection', function (response) {
     console.log('ready to pull')
-    if (response.screenNum === screenNum) {
-      moveRightIn()
+    if (response.screenNum === session.screenNum) {
+      moveDirectionIn(response.dir)
     }
   })
 
   // ###
   // Animaters
-  var moveRightOut = function () {
-    return new Promise(function (resolve, reject) {
+  var moveDirectionOut = function (dir) {
+    var x = ''
+
+    if (dir === 'right') {
+      x = '100vw'
+    } else if (dir === 'left') {
+      x = '-100vw'
+    }
+    return new Promise(function (resolve) {
       $canvas.character
         .css({
-          transform: 'translate(100vw, calc(50vh - 50px))'
+          transform: 'translate(' + x + ', calc(50vh - 50px))'
         })
         .one('transitionend', function () {
           resolve()
@@ -108,8 +127,8 @@ $(document).ready(function () {
     })
   }
 
-  var moveRightIn = function () {
-    return new Promise(function (resolve, reject) {
+  var moveDirectionIn = function (dir) {
+    return new Promise(function (resolve) {
       $canvas.character
         .css({
           transform: 'translate(50vw, calc(50vh - 50px))'
@@ -120,33 +139,19 @@ $(document).ready(function () {
     })
   }
 
-  var animateCharacter = function (startScreen, endScreen, endPoint) {
-    if (screenNum === startScreen) {
-      // Animate away from here
-      $canvas.character.animate({
-        transform: 'translate(100vw, calc(50vh - 50px))'
-      })
-    } else if (screenNum === endScreen) {
-      // Animate into here
-    }
-    // window.requestAnimationFrame(function () {
-    //   $canvas.character.css('transform', 'translate(' + x + 'px, ' + y + 'px')
-    // })
-  }
-
   var setSession = function (response) {
     // Don't set screen number if already set
-    if (screenNum) {
+    if (session.screenNum) {
       return
     }
 
-    screens = response.screens
-    console.log('Screens are', screens)
+    session.screens = response.screens
+    console.log('Screens are', session.screens)
 
-    screenNum = response.screenNum
-    $screenStatus.html(screenNum)
+    session.screenNum = response.screenNum
+    $screenStatus.html(session.screenNum)
 
-    if (screenNum !== 1) {
+    if (session.screenNum !== 1) {
       $canvas.character
         .addClass('notransition')
         .css('transform', 'translate(-100px, calc(50vh - 50px))')
@@ -155,16 +160,5 @@ $(document).ready(function () {
 
     $page.connect.addClass('inactive')
     $page.play.removeClass('inactive')
-  }
-
-  var getSession = function () {
-    return {
-      screen: {
-        width: $(window).width(),
-        height: $(window).height()
-      },
-      sessionId: sessionId,
-      screenNum: screenNum
-    }
   }
 })
